@@ -11,19 +11,30 @@ var project = "";
 
 var saved_project = "";
 
+var hide_errors = false;
 
 var project_write = function(){
 	
+ready_to_notify = false;
+
 	share_menu_is_open = false;
-success_1.currentTime = 0;	
-success_1.play();	
 
 document.getElementById('project_console_notification_list').innerHTML = "";
+document.getElementById('project_console_raw').value = "";
+document.getElementById('download_project_console_button').style.display = "none";
 //reset_project_console_badge();
+
+document.getElementById('template_export_name').value = document.getElementById('titlebox').value;
+
+exported_filename = document.getElementById('template_export_filebox').value;
+exported_template = document.getElementById('raw_templatebox').value;
 
 var style = stylebox_editor.getSession().getValue();
 var markup = markupbox_editor.getSession().getValue();
 var script = scriptbox_editor.getSession().getValue();
+
+console.log(selected_style);
+console.log(selected_script);
 
 var title = document.getElementById('titlebox').value;
 var meta = document.getElementById('metabox').value.toString();
@@ -96,6 +107,8 @@ var iframe = document.createElement('iframe');
 document.getElementById('right_frame').appendChild(iframe);
 iframe.id = "project_frame";
 if (!auto_run_is_on){
+	success_1.currentTime = 0;	
+success_1.play();	
 iframe.classList.add("animated","tdFadeInDown");
 } else {
 document.getElementById('project_frame').style.opacity = "100%";
@@ -104,16 +117,19 @@ iframe.contentWindow.document.open();
 
 iframe.contentWindow.onerror = function(e){
 project_console_notify('<i class="ri-spam-2-line"></i> <span style = "margin-left: 0.5vmin" >'+ e+'</span> <span class = "timestamp">'+timestamp+'</span>','error');
+project_console_raw(e,timestamp);
 notif_error_sound.currentTime = 0;
 notif_error_sound.play();
 };
 
 iframe.contentWindow.console.log = function(c){
 project_console_notify('<i class="ri-arrow-right-s-line"></i> <span>'+ c+'</span> <span class = "timestamp">'+timestamp+'</span>','log');
+project_console_raw(c,timestamp);
 };
 
 iframe.contentWindow.console.warn = function(w){
 project_console_notify('<i class="ri-alert-line"></i> <span style = "margin-left: 0.5vmin">'+ w+'</span> <span class = "timestamp">'+timestamp+'</span>','warning');
+project_console_raw(w,timestamp);
 };
 iframe.contentWindow.document.write(project);
 
@@ -125,7 +141,7 @@ if (recover_timer_is_on){
 if (recovery_allowed){
 save_recovered_project();
 recover_timer = setInterval(save_recovered_project,180000);
-console.log('woo');
+console.log('First time clicked.');
 recover_timer_is_on = true;
 document.getElementById('recover_project_button').style.opacity = "100%";
 document.getElementById('recover_project_button').style.pointerEvents = "auto";
@@ -144,16 +160,22 @@ init_custom_file_paths();
 
 setTimeout(function(){
 
-const iWindow = iframe.contentWindow;
-const iDocument = iWindow.document;
 
-const element = iDocument.documentElement;
+
+const element = document.getElementById('project_frame').contentWindow.document.documentElement;
 
 html2canvas(element).then(canvas => {
     document.body.appendChild(canvas);
 	canvas.id = "project_canvas";
 	document.getElementById('project_canvas').remove();
 	document.body.appendChild(canvas);
+}).catch(error => {
+
+notify("You're typing too fast! Slow down and give nuken some room to breathe.");
+hide_errors = true;
+setTimeout(function(){hide_errors=false},1000);
+
+
 });
 
 setTimeout(function(){
@@ -168,34 +190,13 @@ var rgb = "rgb(" + p[0]+", "+p[1]+", "+p[2]+")";
 
 document.getElementById('right_frame').style.backgroundImage = "linear-gradient(to left, "+rgb+", "+rgb+")";
 //document.getElementById('console_button').style.color = rgb;
-},100);
-
-},100);
-
-};
-
-window.onerror = function(e){
-	
-if (template_load_listener){
-document.getElementById('custom_template_source').value = "";
-document.getElementById('custom_template_source').placeholder = "That file isn't formatted correctly. Please try again.";
-
 setTimeout(function(){
-document.getElementById('custom_template_icon').click();
-},5);
-template_load_listener = false;
-} else {
-var temp = e.toString().replace(/'/g, "");
+ready_to_notify = true;
+},10);
+},10);
 
+},10);
 
-notify(`nuken encountered <a onclick = "prompt_for_web('`+temp+`')" >a runtime error.</a>`,0);
-
-if (ready_to_notify){
-notif_error_sound.currentTime = 0;
-notif_error_sound.play();
-}
-}
-	
 };
 
 var prompt_for_web = function(error){

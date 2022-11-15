@@ -10,6 +10,8 @@ Find the JS files --> Have Electron read the JS files and pass them onto addons_
 
 var addon_content_div_index = [];
 
+var addon_address_book = [];
+
 var item_to_write = "";
 
 var init_addons = function(){
@@ -48,6 +50,8 @@ setTimeout(function(){
 var filename = url.replace(/^.*[\\\/]/, '');
 console.log(filename);
 
+if (content_menu_available){
+
 document.getElementById('library_div').innerHTML += `
 <div id = "`+filename+`" class = "content_div">
 <img src = "icons/addon_install.png" ></img>
@@ -60,6 +64,9 @@ document.getElementById('library_div').innerHTML += `
 </div>
 </div> 
 `;
+
+}
+
 },100);
 	
 		
@@ -267,6 +274,8 @@ addon_height = "auto";
 }
 
 
+addon_address_book.push(addon.codename);
+
 /* write the addon to the add-on menu dropdown. here's an example element, minus the UIkit class names.
 
 <img ondragend="pin_addon(<ADDON CODENAME>)" id="<ADDON CODENAME>_icon" uk-toggle="" target="#<ADDON CODENAME>_page" src="../../../<ADDON ICON>">
@@ -274,6 +283,8 @@ addon_height = "auto";
 */
 
 document.getElementById('addon_selection').innerHTML += `<img ondragend = "pin_addon(`+addon.codename+`)" id = '`+addon.codename+`_icon' class='uk-width-expand' uk-toggle target = '#`+addon.codename+`_page' src = '`+addon_direc+addon_icon+`'></img>`;
+
+if (content_menu_available){
 
 document.getElementById('content_div').innerHTML += `
 
@@ -291,6 +302,7 @@ document.getElementById('content_div').innerHTML += `
 </div> 
 
 `;
+}
 
 //write the actual add-on to its own window. here, we generate a brand new UIkit modal in the div #addon_sandbox, where all the add-on windows are written. All of the attributes we defined above are written or attributed to this new add-on window modal div thingy.
 
@@ -583,6 +595,49 @@ document.getElementById(addon).remove();
 
 };
 
+
+var init_addons_online = function(state){
+
+if (state === 'offline'){
+	
+for (var i = 0; i < addon_address_book.length; ++i) {
+var addon =window[addon_address_book[i].toString()];
+console.log(addon);
+var is_online = addon.online;
+
+if (is_online){
+document.getElementById(addon.codename+"_modal_inner").innerHTML = addon_text;
+document.getElementById(addon.codename+"_modal_outer").style.width = "100%";
+document.getElementById(addon.codename+"_modal_outer").style.height = "100%";
+document.getElementById(addon.codename+"_modal_inner").innerHTML += '<button id = "'+addon+'_close_button" class="uk-modal-close" style = "float:right;display:inline-block;margin:0px" type="button"><i class="ri-check-fill"></i> <span>Okay then</span></button>';
+}
+
+}
+
+} else {
+	
+	
+
+document.getElementById('addon_selection').innerHTML = "";
+
+for (var i = 0; i < addon_address_book.length; ++i) {
+
+document.getElementById(addon_address_book[i]+"_page").remove();
+load_addon(addon_direc+window[addon_address_book[i]].codename+".js");
+}
+}
+}
+
+
+var shop_page_innerhtml = `
+
+    <div class="uk-modal-dialog uk-modal-body" id="shop_page_body">
+        <h2 id="shop_page_title" class="uk-modal-title"><i class="ri-shopping-bag-fill"></i> <span>nuken Shop</span></h2>
+       <!--Exit--> <button class="uk-modal-close" type="button"><i class="ri-check-fill"></i> <span>I'm done looking</span></button>
+	  <!--nuken Shop frame is written here eventually-->
+    <iframe id="shop_frame" class="menu_frame" src="https://nuken.xyz/shop/shop.html"></iframe></div>
+
+`;
 
   
 

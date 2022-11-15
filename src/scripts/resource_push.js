@@ -191,8 +191,13 @@ enable_sound.play();
 	
 
 	// you know those icons in the Export Menu that show what resources you currently have selected? this updates the script icon there.
-	document.getElementById('script_preview').src = resource.icon;
-	document.getElementById('script_preview').title = "This project uses "+resource.title+".";
+	document.getElementById('export_script_preview').src = resource.icon;
+	document.getElementById('template_script_preview').src = resource.icon;
+	
+	document.getElementById("scriptbox").getElementsByClassName("ace_gutter")[0].style.backgroundImage = "url('"+resource.icon+"')";
+	
+	document.getElementById('export_script_preview').title = "This project uses "+resource.title+".";
+	document.getElementById('template_script_preview').title = "This project uses "+resource.title+".";
 
 
 //set the value for extra_script, this will eventually be written to the project in the preview area
@@ -302,8 +307,13 @@ enable_sound.play();
 
     }
 	
-		document.getElementById('style_preview').src = resource.icon;
-		document.getElementById('style_preview').title = "This project uses "+resource.title+".";
+		document.getElementById('export_style_preview').src = resource.icon;
+		document.getElementById('template_style_preview').src = resource.icon;
+		
+		document.getElementById("stylebox").getElementsByClassName("ace_gutter")[0].style.backgroundImage = "url('"+resource.icon+"')";
+		
+		document.getElementById('export_style_preview').title = "This project uses "+resource.title+".";
+		document.getElementById('template_style_preview').title = "This project uses "+resource.title+".";
 
 
     extra_style += resource.extra.toString();
@@ -358,6 +368,8 @@ enable_sound.play();
 
     document.getElementById('script_menu').style.display = "none";
     document.getElementById('custom_script_input').style.display = "block";
+	
+	document.getElementById("scriptbox").getElementsByClassName("ace_gutter")[0].style.backgroundImage = "url('icons/add.png')";
 
 };
 
@@ -400,6 +412,8 @@ enable_sound.play();
 
     document.getElementById('style_menu').style.display = "none";
     document.getElementById('custom_style_input').style.display = "block";
+
+	document.getElementById("stylebox").getElementsByClassName("ace_gutter")[0].style.backgroundImage = "url('icons/add.png')";
 
 };
 
@@ -571,3 +585,6 @@ enable_sound.play();
 //push the JS and CSS resource icons to their respective management menus, regardless of whether the user is online or not (since these resources can obviously be used either way)
 push_resource(javascript_lang, 'script');
 push_resource(css3_sheet, 'style');
+
+
+

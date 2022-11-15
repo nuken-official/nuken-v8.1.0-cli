@@ -18,6 +18,9 @@ function download(filename, text) {
 //this is the function that's called when the "Export project" button is clicked. it essentially tells nuken to download the user's project based on a selected filename and some text (this is written to the file we're downloading).
 
 var export_project = function(){
+	
+	popup_sound.currentTime = 0;
+	popup_sound.play();
 
 var text = project.replace(file_path_insert,'');
 
@@ -32,6 +35,8 @@ var filename = document.getElementById('filebox').value;
   element.click();
 
   document.body.removeChild(element);
+  
+  
 };
 
 
@@ -60,7 +65,8 @@ var keep_js = scriptbox_editor.getSession().getValue();
 	file_path_insert = `
 <!--nuken_file_path_insert_begin-->	
 <script>
-//Don't worry about the code below, it'll be removed when you export your project :)
+//Don't worry about the code below, it'll be removed when you export your project.
+//Don't believe us? Go ahead, open your exported project in a text editor.
 var all_images=document.getElementsByTagName('img');for(var i=0;i<all_images.length;++i){var img=all_images[i];img.src='`+loc+`'+img.src.replace('`+nuken_location+`','')}
 var all_anchors=document.getElementsByTagName('a');for(var j=0;j<all_anchors.length;++j){var anc=all_anchors[i];anc.href='`+loc+`'+anc.href.replace('`+nuken_location+`','')}
 var all_areas=document.getElementsByTagName('area');for(var k=0;k<all_areas.length;++k){var are=all_areas[k];are.href='`+loc+`'+are.href.replace('`+nuken_location+`','')}
@@ -82,9 +88,34 @@ var all_videos=document.getElementsByTagName('video');for(var u=0;u<all_videos.l
 	
 	//reset the text boxes with our saved data (see the beginning of this function), for safekeeping.
 
+
+/*
 stylebox_editor.getSession().setValue(keep_css);
 markupbox_editor.getSession().setValue(keep_html);
 scriptbox_editor.getSession().setValue(keep_js);
+*/
 
+};
 
+var exported_template_filename = document.getElementById('template_export_filebox').value.toString();
+var exported_template_content = document.getElementById('raw_templatebox').value.toString();
+
+function download_exported_template(filename, text) {
+	//MAKE SURE we remove any SENSITIVE project config data from the project before exporting
+	
+exported_template_filename = document.getElementById('template_export_filebox').value.toString();
+exported_template_content = document.getElementById('raw_templatebox').value.toString();
+	
+	text = exported_template_content;
+	console.log('Downloader initiated.');
+  var element = document.createElement('a');
+  element.setAttribute('href', 'data:text/js;charset=utf-8,' + encodeURIComponent(text));
+  element.setAttribute('download', exported_template_filename);
+
+  element.style.display = 'none';
+  document.body.appendChild(element);
+
+  element.click();
+//and now that we're done, we get rid of the link.
+  document.body.removeChild(element);
 }

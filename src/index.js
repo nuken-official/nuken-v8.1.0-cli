@@ -6,7 +6,6 @@ const addon_index = [];
 const theme_index = [];
 const template_index = [];
 
-
 const addon_directory = "content/addons/";
 const theme_directory = "content/themes/";
 const template_directory = "content/templates/";
@@ -283,38 +282,97 @@ unzipper.extract({
 mainWindow.webContents.session.on('will-download', (event, item, webContents) => {
   // Set the save path, making Electron not to prompt a save dialog.
   
-  console.log(path.join(__dirname,addon_directory));
+  var is_shop_content = false;
   
-  var content_type = item.getFilename().toString();
+  
+    var content_type = item.getFilename().toString();
   var content_directory = addon_directory;  
-  console.log(content_type);
-  if (content_type.includes('addon')){
-item.setSavePath(path.join(__dirname,addon_directory+content_type));  
+var item_location = item.getURL();
+
+
+if (item_location.toString().includes('data:') && item_location.toString().includes('text/') ){
+	
+	is_shop_content = false;
+
+console.log('not shop content');
+
+} else {
+
+is_shop_content = true;
+
+if (content_type.includes('addon')){
+item.setSavePath(path.join(__dirname,addon_directory+content_type)); 
+ 
   } else if (content_type.includes('theme')){
 item.setSavePath(path.join(__dirname,theme_directory+content_type));
+
   } else if (content_type.includes('template') || content_type.includes('_pack')){
 item.setSavePath(path.join(__dirname,template_directory+content_type));
+
   } else {
-console.log('Error');	  
+mainWindow.webContents.executeJavaScript('console.log("'+content_type+'")');
+  	  
  }	  
+}
+
+  
+
+  
 
   item.on('updated', (event, state) => {
     if (state === 'interrupted') {
-      console.log('Download is interrupted but can be resumed')
+		//INTERRUPTED
+      console.log('Download is interrupted but can be resumed');
+	    mainWindow.webContents.executeJavaScript('UIkit.modal("#shop_confirm_page").hide();UIkit.modal("#shop_success_page").hide();UIkit.modal("#shop_error_page").show();');
+	    mainWindow.webContents.executeJavaScript('notif_error_sound.currentTime=0;notif_error_sound.play();');
     } else if (state === 'progressing') {
       if (item.isPaused()) {
-        console.log('Download is paused')
-      } else {
-        console.log(`Received bytes: ${item.getReceivedBytes()}`)
+		  //PAUSED
+        console.log('Download is paused');
+				mainWindow.webContents.executeJavaScript('UIkit.modal("#shop_confirm_page").hide();UIkit.modal("#shop_success_page").hide();UIkit.modal("#shop_error_page").show();');
+	    mainWindow.webContents.executeJavaScript('notif_error_sound.currentTime=0;notif_error_sound.play();');
+      
+	  } else {
+		  //SUCCESS
+        console.log(`Received bytes: ${item.getReceivedBytes()}`);
       }
     }
   })
   item.once('done', (event, state) => {
+	  	  mainWindow.webContents.executeJavaScript('console.log("'+state+'")');
+		 
+		  
     if (state === 'completed') {
+		
+	if (is_shop_content){	
+
       console.log('Download successfully');
 	  mainWindow.webContents.executeJavaScript('init_extract_process()');
+	  //SHOP CONTENT DOWNLOADED SUCCESSFULLY
+	  	  	  		mainWindow.webContents.executeJavaScript('UIkit.modal("#shop_confirm_page").hide();UIkit.modal("#shop_success_page").show();');
+	    mainWindow.webContents.executeJavaScript('download_sound.currentTime=0;download_sound.play();');
+	} else {
+	
+		  mainWindow.webContents.executeJavaScript('notify("Export successful.")');
+		  	    mainWindow.webContents.executeJavaScript('download_sound.currentTime=0;download_sound.currentTime=0;download_sound.play();');
+	
+	}
+	  
+	    } else if (state === 'cancelled') {
+	//DOWNLOAD CANCELLED BY USER	
+
+if (is_shop_content){
+		  		mainWindow.webContents.executeJavaScript('UIkit.modal("#shop_confirm_page").hide();UIkit.modal("#shop_success_page").hide();UIkit.modal("#shop_error_page").show();');
+	    mainWindow.webContents.executeJavaScript('notif_error_sound.currentTime=0;notif_error_sound.play();');
+} else {
+	  mainWindow.webContents.executeJavaScript('notify("Export cancelled.")');
+	  mainWindow.webContents.executeJavaScript('close_sound.currentTime=0;close_sound.play();');
+}
     } else {
-      console.log(`Download failed: ${state}`)
+		//SOMETHING WENT WRONG
+	  	  mainWindow.webContents.executeJavaScript('console.log("Download failed: '+state+'")');
+	  		mainWindow.webContents.executeJavaScript('UIkit.modal("#shop_confirm_page").hide();UIkit.modal("#shop_success_page").hide();UIkit.modal("#shop_error_page").show();');
+	    mainWindow.webContents.executeJavaScript('notif_error_sound.currentTime=0;notif_error_sound.play();');
     }
   })
 })
@@ -343,12 +401,12 @@ app.on('window-all-closed', () => {
 
 // 👇 Comment out the code below if you want to enable DevTools in nuken. 👇
 
-
+/*
 app.on("browser-window-created", (e, win) => {
    win.removeMenu();
 });
 
-
+*/
 
 // 👆 Comment out the code above if you want to enable DevTools in nuken. 👆
 

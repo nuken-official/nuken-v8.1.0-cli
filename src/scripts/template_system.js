@@ -1,5 +1,6 @@
 var templates_index = []; //an array of all the loaded template .js files
 
+var template_frame;
 
 //same init function as addons and themes, basically we get all the detected .js files from the templates/ directory and add them to the array.
 var init_templates = function(){
@@ -124,11 +125,25 @@ document.getElementById('template_selection').innerHTML += `
 
 }else {
 	
+	if (template.icon.toString().includes('data:image/png')){
+
+document.getElementById('template_selection').innerHTML += `
+
+<img id = '`+template.codename+`_icon'  class = "template_menu_item" onclick = "select_template(`+template.codename+`);" src = "`+template.icon+`" ></img>
+
+`;	
+
+} else {
+
 document.getElementById('template_selection').innerHTML += `
 
 <img id = '`+template.codename+`_icon'  class = "template_menu_item" onclick = "select_template(`+template.codename+`);" src = "content/templates/`+template.icon+`" ></img>
 
 `;	
+
+}
+	
+
 	
 }
 
@@ -136,11 +151,17 @@ document.getElementById('template_selection').innerHTML += `
 
 if (template.codename === "welcome_to_nuken"){
 } else {
+	
+if (template.icon.includes('data:')){
+var template_image_loc = "";
+} else {
+var template_image_loc = template_direc;
+}	
 
 document.getElementById('content_div').innerHTML += `
 
 <div id = '`+template.codename+`_content_div' class = "content_div">
-<img src = "`+template_direc+template.icon+`"></img>
+<img src = "`+template_image_loc+template.icon+`"></img>
 <span>`+template.title+`</span>
 <br>
 <button uk-toggle = "target:#template_page" onclick = "document.getElementById('`+template.codename+`_icon').click();" ><i class="ri-external-link-line"></i></button>
@@ -150,6 +171,9 @@ document.getElementById('content_div').innerHTML += `
 
 `;
 }
+
+
+
 };
 
 var select_template = function(template){
@@ -321,7 +345,7 @@ if (template.view === ''){
 	document.getElementById('template_direct_view').style.display = "inline-block";
 
 document.getElementById('template_direct_view').onclick = function(){ 
-window.open('../../../templates/'+template.view.toString(),"_blank");
+window.open(template_direc+'templates/'+template.view.toString(),"_blank");
 popup_sound.currentTime = 0;
 popup_sound.play();
 
@@ -588,4 +612,98 @@ document.getElementById(element+"_body").innerHTML = `
 
 
 
+var update_template_export = function(){
+	
+var title = document.getElementById('template_export_name').value;
+var codename = document.getElementById('template_export_filebox').value;
+var codename2 = codename.replace('.js','');
+var icon = document.getElementById('template_export_image_preview').src;
+var description = document.getElementById('template_export_description').value;
+var stylebox_selection = selected_style_icon;
+var meta = document.getElementById('metabox').value;
+var scriptbox_selection = selected_script_icon;
+var view = codename;	
+
+var style = stylebox_editor.getSession().getValue();
+var markup = markupbox_editor.getSession().getValue();
+var script = scriptbox_editor.getSession().getValue();
+
+template_frame = `var `+codename2+` = { 
+
+title: "`+title+`",
+
+codename: "`+codename2+`",
+
+location: 'On this device',
+
+description: `+'`'+description+'`'+`,
+
+stylebox_selection:'`+stylebox_selection+`',
+
+style: `+'`'+style+'`'+`,
+
+markup: `+'`'+markup+'`'+`,
+
+meta:`+'`'+meta+'`'+`,
+
+scriptbox_selection: '`+scriptbox_selection+`',
+
+script: `+'`'+script+'`'+`,
+
+online: false,
+
+secure: true,
+
+view:'`+codename+`',
+
+icon: '`+icon+`',
+
+};
+
+push_template(`+codename2+`);
+
+`;
+
+document.getElementById('raw_templatebox').value = template_frame;
+
+};
+
+var randomize_template_icon = function(){
+document.getElementById('template_export_image_button').style.pointerEvents = "none";
+document.getElementById('template_export_image_preview').style.opacity = "50%";	
+document.getElementById('template_export_image_preview').style.transform = "scale(0.975)";
+var image_array = ['red','orange','yellow','green','blue','purple','indigo','red'];
+var x = Math.floor(Math.random()*image_array.length-1);
+
+if (x<0 || x>=image_array.length){
+x=1;
+}
+console.log(image_array[x]);
+console.log(x+"/"+image_array.length);
+setTimeout(function(){
+document.getElementById('template_export_image_preview').src = "icons/temp/"+image_array[x]+".png";	
+},100);
+
+setTimeout(function(){
+var c = document.createElement('canvas');
+var img = document.getElementById('template_export_image_preview');
+c.height = img.naturalHeight;
+c.width = img.naturalWidth;
+var ctx = c.getContext('2d');
+
+ctx.drawImage(img, 0, 0, c.width, c.height);
+var base64String = c.toDataURL();
+
+document.getElementById('template_export_image_preview').src = base64String;
+
+update_template_export();
+success_2.currentTime = 0;
+success_2.play();
+setTimeout(function(){
+document.getElementById('template_export_image_button').style.pointerEvents = "auto";
+document.getElementById('template_export_image_preview').style.opacity = "100%";
+document.getElementById('template_export_image_preview').style.transform = "scale(1)";
+},250);
+},110);
+};
 

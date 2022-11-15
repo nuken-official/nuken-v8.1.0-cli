@@ -29,6 +29,12 @@ var notification_list = document.getElementById('notification_list');
 var notify = function(message, time, priority){
 //UIkit.notification(message,{pos: 'bottom-right',timeout:time,status:priority});
 
+//get the user's setting from localstorage, if this is false don't show any notifs at all and overwrite the menu with some placeholder text
+var disabled =  JSON.parse(localStorage.getItem('disable_notifications'));	
+if (disabled){
+document.getElementById('notification_placeholder').innerHTML = `<i class="ri-cloud-windy-fill"></i><br>Notifications <br>are disabled`;
+} else {
+
 if (ready_to_notify){
 //If we're ready to show notifications
 
@@ -52,22 +58,18 @@ notification_list.innerHTML +=
 check_notif_count();
 //update the notif count in the system so nuken can check to see if the empty placeholder should be displayed
 
-//log it to the actual program console
-console.log(message);
 
 } 
-
-//get the user's setting from localstorage, if this is false don't show any notifs at all and overwrite the menu with some placeholder text
-var disabled =  JSON.parse(localStorage.getItem('disable_notifications'));	
-if (disabled){
-document.getElementById('notification_placeholder').innerHTML = `<i class="ri-cloud-windy-fill"></i><br>Notifications <br>are disabled`;
-};
+}
 
 };
 
 
 //notification system for the project console
 var project_console_notify = function(message,type){	
+	
+	
+	document.getElementById('download_project_console_button').style.display = "block";
 	
 	//the display property value for the "what does this mean?" button that appears under project errors. by default, it isn't seen unless the notification is an error, so we hide it in every other case. 
 	var errorbutton = "none";
@@ -97,6 +99,7 @@ document.getElementById('project_console_notification_list').innerHTML +=`
 <i onclick = "copy_text(this.parentElement.querySelector('span').innerHTML,this)" style = "float:right" class = "ri-file-copy-line copy_button"></i>
 </div>
 `;
+
 
 //update the project notification count
 project_notification_count = project_notification_count+1;
@@ -132,7 +135,7 @@ var offline_text = `
 <div class = 'offline-text' >
 <h1><i class='ri-cloud-off-fill'></i>
 <br>No connection</h1>
-<button style = "pointer-events:none!important" onclick = 'window.location.href = "ms-settings://network";' >Check your settings</button>
+<button onclick = 'window.location.href = "ms-settings://network";' >Check your settings</button>
 
 `;
 
@@ -188,7 +191,7 @@ window.open('https://www.stackoverflow.com/search?q='+encodeURIComponent(query),
 //literally copies text to the clipboard, and updates the button icons to match the status ("copy", copied, "copy")
 var copy_text = function(text,element){
 navigator.clipboard.writeText(text);
-notify('nuken wrote some text to your clipboard.',0);
+notify(`nuken wrote some <a onclick = "alert('`+text+`')">text</a> to your clipboard.`,0);
 
 if(element){
 element.classList.remove('ri-file-copy-line');	
@@ -201,3 +204,24 @@ element.classList.remove('ri-check-fill');
 
 };
 
+
+var project_console_raw = function(message,timestamp){
+document.getElementById('project_console_raw').value += timestamp+" "+message+"\n";
+};
+
+var download_project_console = function(){
+
+notify('Project Console log file successfully generated, ready for download.');
+	
+popup_sound.currentTime = 0;
+popup_sound.play();	
+	
+var log = document.getElementById('titlebox').value+` [`+document.getElementById('filebox').value+`]
+
+`+document.getElementById('project_console_raw').value+`
+[EXPORTED] `+date+`
+
+`;	
+	
+download('console.txt',log);
+};

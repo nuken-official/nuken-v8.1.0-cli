@@ -82,3 +82,67 @@ var canvas = document.querySelector("canvas");
   
   };
   
+  
+var share_page_innerhtml = `
+
+
+<div id="left">
+
+<div class="widget">
+<img src="icons/images/share.jpg">
+<h1>Join the community</h1>
+<p>Welcome to the <b><i class="ri-share-fill" style="font-size:2.25vmin"></i> Share Menu.</b> Looking to join us? Pick a platform and hop in!</p>
+</div>
+
+<div class="grid">
+
+<div onclick="popup_sound.currentTime=0;popup_sound.play();window.open('https://nuken.xyz/discord');" style="background-color:#404eed" class="app">
+<i class="ri-discord-fill"></i>
+<h1 style="font-family:'discord';">Discord</h1>
+</div>
+
+<div onclick="popup_sound.currentTime=0;popup_sound.play();window.open('https://nuken.xyz/github');" style="background-color:#161b22" class="app">
+<i class="ri-github-fill"></i>
+<h1 style="font-family:'github';">GitHub</h1>
+</div>
+
+<div onclick="popup_sound.currentTime=0;popup_sound.play();window.open('https://nuken.xyz/twitter');" style="background-color:#1DA1F2" class="app">
+<i class="ri-twitter-fill"></i>
+<h1 style="font-family:Helvetica;">Twitter</h1>
+</div>
+<br>
+
+<div onclick="popup_sound.currentTime=0;popup_sound.play();window.open('https://nuken.xyz/reddit');" style="background-color:#FF5700" class="app">
+<i class="ri-reddit-fill"></i>
+<h1 style="font-family:Verdana;">Reddit</h1>
+</div>
+
+<div onclick="popup_sound.currentTime=0;popup_sound.play();window.open('https://nuken.xyz/twitch');" style="background-color:#9147ff" class="app">
+<i class="ri-twitch-fill"></i>
+<h1 style="font-family:'twitch';">Twitch</h1>
+</div>
+
+<div onclick="popup_sound.currentTime=0;popup_sound.play();window.open('https://nuken.xyz/instagram');" style="background-color:#C13584" class="app">
+<i class="ri-instagram-line"></i>
+<h1 style="font-family:'instagram';">Instagram</h1>
+</div>
+
+</div>
+
+</div>
+
+<div id="right">
+<h1>Share my project</h1>
+<p>If you want to share your work, try <b style="cursor:pointer" uk-toggle="#export_page" tabindex="0" aria-expanded="false"><i uk-toggle="#export_page" class="ri-share-box-fill" style="font-size:2.25vmin" tabindex="0" aria-expanded="false"></i> <span>exporting it</span></b>. If you'd rather just take a picture, we're here for that too.</p>
+<button id="project_snapshot_button" onclick="write_preview()"><i class="ri-camera-fill"></i> <span> Take a snapshot</span></button>
+<span id="share_project_container">
+<iframe src="" id="share_frame"></iframe>
+</span>
+<div id="share_project_bar">
+<i id="download_project_share" onclick="download_preview()" class="ri-download-2-fill"></i>
+<i id="copy_project_share" onclick="copy_preview()" class="ri-checkbox-multiple-blank-line"></i>
+</div>
+
+</div>
+
+`;
